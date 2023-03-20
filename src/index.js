@@ -1,6 +1,7 @@
 const refs = {
     gallery: document.querySelector('.gallery'),
-    
+    asd: 'gfds',
+
 }
 
 
