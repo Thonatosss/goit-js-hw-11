@@ -1,1 +1,28 @@
 @import '~node_modules/modern-normalize/modern-normalize.css';
+.gallery{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    
+}
+
+.search-form{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: teal;
+    position: fixed;
+}
+input{
+    height: 60px;
+    border-radius: 10px;
+    width: 30%;
+}
+button{
+    right: 0;
+    height: 60px;
+    border-radius: 10px;
+    border: none;
+}
