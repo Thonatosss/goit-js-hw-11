@@ -1,10 +1,9 @@
+'use strict';
 import SimpleLightbox from "simplelightbox/dist/simple-lightbox.esm";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import axios from 'axios';
+import { pixabayApiService } from "./pixabay-api";
 
-const BASE_URL = 'https://pixabay.com/api/';
-let page = 1;
-
+const pixabayApi = new pixabayApiService();
 
 
 const refs = {
@@ -19,10 +18,10 @@ refs.form.addEventListener('submit', onSubmitForm);
 refs.loadMoreBtn.addEventListener('click', onLoadMoreBtn);
 
 function onLoadMoreBtn(event) {
-  page += 1;
   event.preventDefault();
-  fetchMorePhotos(refs.input.value, page).then(filterData).catch(error => console.log(error));
-  console.log(refs.input.value);
+  pixabayApi.fetchPhotos()
+    .then(filterData)
+    .catch(error => console.log(error));
 }
 
 function onSubmitForm(event) {
@@ -30,20 +29,21 @@ function onSubmitForm(event) {
   const {
     elements: { searchQuery }
   } = event.currentTarget;
+
+  pixabayApi.searchQuerry = searchQuery.value;
+
+  pixabayApi.resetPage();
+
   clearElement(refs.gallery);
-  fetchPhotos(searchQuery.value).then(filterData).catch(error => console.log(error));
-  
+
+  pixabayApi.fetchPhotos().then(response => {
+    filterData(response);
+    refs.loadMoreBtn.classList.remove('hide-button');
+    
+  }).catch(error => console.log(error));
+
 }
 
-async function fetchMorePhotos(toSearch, pageCounter) {
-  const response = await axios.get(`${BASE_URL}?key=34587378-1709a2c174b77a7efdbc7c71b&q=${toSearch}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${pageCounter}`);
-  return response.data;
-}
-async function fetchPhotos(toSearch) {
-  page = 1;
-  const response = await axios.get(`${BASE_URL}?key=34587378-1709a2c174b77a7efdbc7c71b&q=${toSearch}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=1`);
-  return response.data;
-}
 
 function filterData(data) {
   const filteredData = data.hits.map(photo => ({
@@ -61,21 +61,16 @@ function filterData(data) {
   }
   Notify.success(`Hooray! We found ${data.totalHits} images`)
 
-  console.log(filteredData);
-
   fillElementWithContent(refs.gallery, createPhotoMarkup, filteredData);
 
-  const { height: cardHeight } = document
-    .querySelector(".gallery")
-    .firstElementChild.getBoundingClientRect();
-
+  document.querySelector(".gallery").firstElementChild.getBoundingClientRect();
   window.scrollBy({
     behavior: "smooth",
   });
+
   new SimpleLightbox(".photo-card a", {
     scrollZoom: false,
   });
-  
 
   return filteredData;
 }
