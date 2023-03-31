@@ -40,6 +40,7 @@ async function onSubmitForm(event) {
   clearElement(refs.gallery);
 
   try {
+    refs.loadMoreBtn.classList.add('hide-button');
     const response = await pixabayApi.fetchPhotos();
     filterData(response);
     refs.loadMoreBtn.classList.remove('hide-button');
