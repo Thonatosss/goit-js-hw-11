@@ -1,4 +1,4 @@
-'use strict';
+
 import SimpleLightbox from "simplelightbox/dist/simple-lightbox.esm";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { pixabayApiService } from "./pixabay-api";
