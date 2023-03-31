@@ -17,14 +17,17 @@ const refs = {
 refs.form.addEventListener('submit', onSubmitForm);
 refs.loadMoreBtn.addEventListener('click', onLoadMoreBtn);
 
-function onLoadMoreBtn(event) {
+async function onLoadMoreBtn(event) {
   event.preventDefault();
-  pixabayApi.fetchPhotos()
-    .then(filterData)
-    .catch(error => console.log(error));
-}
 
-function onSubmitForm(event) {
+  try {
+    const loadMoreResults = await pixabayApi.fetchPhotos();
+    filterData(loadMoreResults);
+  } catch (error) {
+    console.log(error);
+  }
+}
+async function onSubmitForm(event) {
   event.preventDefault();
   const {
     elements: { searchQuery }
@@ -36,15 +39,17 @@ function onSubmitForm(event) {
 
   clearElement(refs.gallery);
 
-  pixabayApi.fetchPhotos().then(response => {
+  try {
+    const response = await pixabayApi.fetchPhotos();
     filterData(response);
     refs.loadMoreBtn.classList.remove('hide-button');
-    
-  }).catch(error => console.log(error));
 
+  } catch (error) {
+    console.log(error.message);
+
+  }
+  
 }
-
-
 function filterData(data) {
   const filteredData = data.hits.map(photo => ({
     webformatURL: photo.webformatURL,
@@ -108,5 +113,3 @@ function createPhotoMarkup(items) {
 </div>`;
   }, '');
 }
-
-
