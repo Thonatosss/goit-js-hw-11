@@ -9,9 +9,6 @@ export class pixabayApiService {
 
 
     async fetchPhotos() {
-        if (this.searchQuerry === '') {
-            return Notify.failure('Search querry can not be empty.')
-        }
         try {
             
             const response = await axios.get(`

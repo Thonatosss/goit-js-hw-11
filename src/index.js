@@ -5,7 +5,6 @@ import { pixabayApiService } from "./pixabay-api";
 
 const pixabayApi = new pixabayApiService();
 
-
 const refs = {
   form: document.querySelector('.search-form'),
   input: document.querySelector('input'),
@@ -33,8 +32,10 @@ async function onSubmitForm(event) {
     elements: { searchQuery }
   } = event.currentTarget;
 
-  pixabayApi.searchQuerry = searchQuery.value;
-
+  pixabayApi.searchQuerry = searchQuery.value.trim();
+  if(searchQuery.value === ''){
+    return Notify.failure('Search querry can not be empty.');
+  }
   pixabayApi.resetPage();
 
   clearElement(refs.gallery);
@@ -44,9 +45,12 @@ async function onSubmitForm(event) {
     const response = await pixabayApi.fetchPhotos();
     filterData(response);
     refs.loadMoreBtn.classList.remove('hide-button');
+    if(response.hits.length < 40){
+      refs.loadMoreBtn.classList.add('hide-button');
+    }
 
   } catch (error) {
-    console.log(error.message);
+    Notify.failure(error.message);
 
   }
   
@@ -69,7 +73,6 @@ function filterData(data) {
 
   fillElementWithContent(refs.gallery, createPhotoMarkup, filteredData);
 
-  document.querySelector(".gallery").firstElementChild.getBoundingClientRect();
   window.scrollBy({
     behavior: "smooth",
   });
