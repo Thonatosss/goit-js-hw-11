@@ -12,13 +12,6 @@ const refs = {
   gallery: document.querySelector('.gallery'),
 
 }
-const lightbox = new SimpleLightbox(".photo-card a", {
-  scrollZoom: false,
-});
-
-
-
-refs.form.addEventListener('submit', onSubmitForm);
 let infScroll = new InfiniteScroll(refs.gallery, {
   path: function () {
     return `?page=${pixabayApi.page}`;
@@ -28,13 +21,18 @@ let infScroll = new InfiniteScroll(refs.gallery, {
 });
 
 infScroll.on('load', async function () {
-  const response = await pixabayApi.fetchPhotos();
-  filterData(response);
-  if (response.hits.length < 40) {
-    infScroll.off('load');
-
+  try {
+    const response = await pixabayApi.fetchPhotos();
+    filterData(response);
+    if (response.hits.length < 40) {
+      infScroll.off('load');
+    }
+  } catch (error) {
+    console.log(error);
   }
 });
+
+refs.form.addEventListener('submit', onSubmitForm);
 
 async function onSubmitForm(event) {
   event.preventDefault();
@@ -83,8 +81,12 @@ function filterData(data) {
     behavior: "smooth",
   });
 
+  new SimpleLightbox(".photo-card a", {
+    scrollZoom: false,
+  });
+  
   return filteredData;
-  lightbox.refresh();
+  
 }
 function clearElement(element) {
   return element.innerHTML = '';
