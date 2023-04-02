@@ -12,6 +12,9 @@ const refs = {
   loadMoreBtn: document.querySelector('.load-more'),
 
 }
+const lightbox = new SimpleLightbox(".photo-card a", {
+  scrollZoom: false,
+});
 
 refs.form.addEventListener('submit', onSubmitForm);
 refs.loadMoreBtn.addEventListener('click', onLoadMoreBtn);
@@ -77,11 +80,10 @@ function filterData(data) {
     behavior: "smooth",
   });
 
-  new SimpleLightbox(".photo-card a", {
-    scrollZoom: false,
-  });
+  
 
   return filteredData;
+  lightbox.refresh();
 }
 function clearElement(element) {
   return element.innerHTML = '';
