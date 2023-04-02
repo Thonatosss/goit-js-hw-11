@@ -10,7 +10,6 @@ const refs = {
   form: document.querySelector('.search-form'),
   input: document.querySelector('input'),
   gallery: document.querySelector('.gallery'),
-  loadMoreBtn: document.querySelector('.load-more'),
 
 }
 const lightbox = new SimpleLightbox(".photo-card a", {
@@ -33,6 +32,7 @@ infScroll.on('load', async function () {
   filterData(response);
   if (response.hits.length < 40) {
     infScroll.off('load');
+
   }
 });
 
@@ -78,13 +78,10 @@ function filterData(data) {
   Notify.success(`Hooray! We found ${data.totalHits} images`)
 
   fillElementWithContent(refs.gallery, createPhotoMarkup, filteredData);
-  console.log(infScroll);
 
   window.scrollBy({
     behavior: "smooth",
   });
-
-  
 
   return filteredData;
   lightbox.refresh();
