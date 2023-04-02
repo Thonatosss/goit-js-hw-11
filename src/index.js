@@ -1,6 +1,7 @@
-
-import SimpleLightbox from "simplelightbox/dist/simple-lightbox.esm";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import SimpleLightbox from "simplelightbox/dist/simple-lightbox.esm";
+import InfiniteScroll from "infinite-scroll";
+
 import { pixabayApiService } from "./pixabay-api";
 
 const pixabayApi = new pixabayApiService();
@@ -16,19 +17,25 @@ const lightbox = new SimpleLightbox(".photo-card a", {
   scrollZoom: false,
 });
 
+
+
 refs.form.addEventListener('submit', onSubmitForm);
-refs.loadMoreBtn.addEventListener('click', onLoadMoreBtn);
+let infScroll = new InfiniteScroll(refs.gallery, {
+  path: function () {
+    return `?page=${pixabayApi.page}`;
+  },
+  append: null,
+  history: false,
+});
 
-async function onLoadMoreBtn(event) {
-  event.preventDefault();
-
-  try {
-    const loadMoreResults = await pixabayApi.fetchPhotos();
-    filterData(loadMoreResults);
-  } catch (error) {
-    console.log(error);
+infScroll.on('load', async function () {
+  const response = await pixabayApi.fetchPhotos();
+  filterData(response);
+  if (response.hits.length < 40) {
+    infScroll.off('load');
   }
-}
+});
+
 async function onSubmitForm(event) {
   event.preventDefault();
   const {
@@ -44,13 +51,9 @@ async function onSubmitForm(event) {
   clearElement(refs.gallery);
 
   try {
-    refs.loadMoreBtn.classList.add('hide-button');
+
     const response = await pixabayApi.fetchPhotos();
     filterData(response);
-    refs.loadMoreBtn.classList.remove('hide-button');
-    if(response.hits.length < 40){
-      refs.loadMoreBtn.classList.add('hide-button');
-    }
 
   } catch (error) {
     Notify.failure(error.message);
@@ -75,6 +78,7 @@ function filterData(data) {
   Notify.success(`Hooray! We found ${data.totalHits} images`)
 
   fillElementWithContent(refs.gallery, createPhotoMarkup, filteredData);
+  console.log(infScroll);
 
   window.scrollBy({
     behavior: "smooth",
